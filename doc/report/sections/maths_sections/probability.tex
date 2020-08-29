@@ -1,0 +1,79 @@
+\documentclass[../../main.tex]{subfiles}
+\begin{document}
+
+\subsubsection{Random vectors}
+
+For a random vector $\vect{X} \in \mathbb{R}^n \quad \vect{X} = {\left[X_1 \cdots X_n \right]}^T$:
+
+\[ \textrm{Expectation vector  } {\mathbb{E}[\vect{X}]}_i = \mathbb{E}[X_i]
+\]
+
+\[ \textrm{Covariance matrix  } {\mathbb{V}[\vect{X}]}_{ij} =
+\begin{cases}
+    \textrm{Var}(X_i) = \sigma_i^2 & i = j \\
+    \textrm{Cov}(X_i, X_j) = \sigma_{i,j} & i \neq j
+\end{cases}
+\]
+
+Additionally, the covariance matrix is equivalent to:
+\begin{align*}
+\mathbb{V}[\vect{X}]
+&= \mathbb{E}[(\vect{X} - \mathbb{E}[\vect{X}]){(X - \mathbb{E}[\vect{X}])}^T] \\
+&= \mathbb{E}[\vect{X}\vect{X}^T] - 2\mathbb{E}[\vect{X}]{\mathbb{E}[\vect{X}]}^T + \mathbb{E}[\vect{X}]{\mathbb{E}[\vect{X}]}^T \\
+&= \mathbb{E}[\vect{X}\vect{X}^T] - \mathbb{E}[\vect{X}]{\mathbb{E}[\vect{X}]}^T
+\end{align*}
+
+Therefore
+\[
+{\mathbb{V}[\vect{X}]}_{ij} =
+\mathbb{E}[(X_i - \mathbb{E}[X_i])(X_j - \mathbb{E}[X_j])]
+\]
+$\ldots$ which is the definition of variance/covariance, as expected.
+
+\subsubsection{Manipulating random vectors}
+
+For random vectors $\vect{X}_1, \ldots, \vect{X}_m$, where a new random vector $\vect{Y}$ is given by:
+\[ \vect{Y} = \vect{X}_1 + \cdots + \vect{X}_m \]
+The expectation or variance is simply given by:
+\[ \mathbb{E}[\vect{Y}] = \mathbb{E}[\vect{X}_1] + \cdots \mathbb{E}[\vect{X}_m] \]
+\[ \mathbb{V}[\vect{Y}] = \mathbb{V}[\vect{X}_1] + \cdots \mathbb{V}[\vect{V}_m] \]
+(Assuming that all the random vectors are independent, otherwise you cannot sum their covariance matrices)
+
+Taking the expectation is a linear operation, meaning you can use the following results:
+\[ \textrm{Multiply by scalar}\quad \mathbb{E}[a\vect{X}] = a\mathbb{E}[\vect{X}] \]
+\[ \textrm{Dot product}\quad \mathbb{E}[\vect{w}^T\vect{X}] = \vect{w}^T\mathbb{E}[\vect{X}] \]
+\[ \textrm{Matrix product}\quad \mathbb{E}[A^T\vect{X}] = A\mathbb{E}[\vect{X}] \]
+
+However, taking the variance isn't linear, so you need to consider it more carefully:
+
+\begin{align*}
+\textrm{Multiply by scalar}\quad \mathbb{V}[a\vect{X}]
+&=
+\mathbb{E}[(a\vect{X} - \mathbb{E}[a\vect{X}]){(a\vect{X} - \mathbb{E}[\vect{aX}])}^T] \\
+&=
+a^2\mathbb{E}[(\vect{X} - \mathbb{E}[\vect{X}]){(\vect{X} - \mathbb{E}[\vect{X}])}^T] \\
+&=
+a^2\mathbb{V}[\vect{X}]
+\end{align*}
+
+\begin{align*}
+\textrm{Dot product}\quad \mathbb{V}[\vect{w}^T\vect{X}]
+&=
+\mathbb{E}[(\vect{w}^T\vect{X} - \mathbb{E}[\vect{w}^T\vect{X}]){(\vect{w}^T \vect{X} - \mathbb{E}[\vect{\vect{w}^T X}])}^T] \\
+&=
+\vect{w}^T\mathbb{E}[(\vect{X} - \mathbb{E}[\vect{X}]){(\vect{X} - \mathbb{E}[\vect{X}])}^T]\vect{w} \\
+&=
+\vect{w}^T\mathbb{V}[\vect{X}]\vect{w}
+\end{align*}
+
+\begin{align*}
+\textrm{Matrix product}\quad \mathbb{V}[A\vect{X}]
+&=
+\mathbb{E}[(A\vect{X} - \mathbb{E}[A\vect{X}]){(A\vect{X} - \mathbb{E}[\vect{AX}])}^T] \\
+&=
+A\mathbb{E}[(\vect{X} - \mathbb{E}[\vect{X}]){(\vect{X} - \mathbb{E}[\vect{X}])}^T]A^T \\
+&=
+A\mathbb{V}[\vect{X}]A^T
+\end{align*}
+
+\end{document}

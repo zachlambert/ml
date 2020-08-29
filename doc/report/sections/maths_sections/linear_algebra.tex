@@ -1,0 +1,157 @@
+\documentclass[../../main.tex]{subfiles}
+\begin{document}
+
+\subsubsection{Notation}
+
+All vectors $\vect{x}$ are column vectors:
+\[
+\vect{x} = \left[\begin{matrix}
+        x_1\\
+        x_2\\
+        \vdots\\
+        x_n
+\end{matrix}\right]
+\]
+
+A row vector is denoted with $\vect{x}^T = \left[ x_1 x_2 \cdots  x_n\right]$.
+
+In general, a matrix $A$ should have shape $m\times n$, $A \in \mathbb{R}^{m\times n}$, meaning there are $m$ rows and $n$ columns. Therefore, $A$ transforms a vector $\vect{x} \in \mathbb{R}^n$ to a matrix $\vect{y} = A\vect{x} \in \mathbb{R}^m$.
+
+Matrices are indexed by their row number, then column number, such that $A_{ij}$ is the i'th row and j'th column.
+
+$\vect{a}_j$ refers the j'th column of a matrix.
+
+$\hat{\vect{a}}_i$ refers the i'th row of a matrix, as a column vector, not a row vector. To express it as a row vector, write $\hat{\vect{a}}_i^T$.
+
+ie:
+\[ A =
+\left[\begin{matrix}
+        \uparrow & \uparrow & & \uparrow \\
+        \vect{a}_1 & \vect{a}_2 & \cdots & \vect{a}_n \\
+        \downarrow & \downarrow & & \downarrow
+\end{matrix}\right] =
+\left[\begin{matrix}
+    \leftarrow {\vect{a_1}'}^T \rightarrow \\
+    \leftarrow {\vect{a_2}'}^T \rightarrow \\
+    \cdots \\
+    \leftarrow {\vect{a_m}'}^T \rightarrow \\
+\end{matrix}\right]
+\]
+
+
+When using a matrix $X$ to hold vectors $\vect{x}$, do so as column vectors to remain consistent.
+\[
+X = \left[\begin{matrix}
+        \uparrow & \uparrow & & \uparrow \\
+        \vect{x}_1 & \vect{x}_2 & \cdots & \vect{x}_n \\
+        \downarrow & \downarrow & & \downarrow
+\end{matrix}\right]
+\]
+
+\subsubsection{Matrix calculus definition}
+
+I will use \textit{numerator-layout notation} throughout, which means that a derivative has the same form as its numerator.
+
+\[ \frac{dy}{dx} = \textrm{scalar}\]
+
+\[ \frac{d\vect{y}}{dx} =
+\left[\begin{matrix}
+    \frac{dy_1}{dx} \\
+    \vdots \\
+    \frac{dy_n}{dx}
+\end{matrix}\right] =
+\textrm{column vector}
+\]
+
+\[ \frac{dy}{d\vect{x}} =
+\left[
+    \frac{dy}{dx_1} \cdots \frac{dy}{dx_n}
+\right] =
+\textrm{row vector}
+\]
+
+\[
+\textrm{But  } \nabla_{\vect{x}}(y) =
+\left[\begin{matrix}
+    \frac{dy}{dx_1} \\
+    \vdots \\
+    \frac{dy}{dx_n}
+\end{matrix}\right] =
+{\left(\frac{dy}{d\vect{x}}\right)}^T =
+\textrm{column vector}
+\]
+
+\[
+\frac{d\vect{y}}{d\vect{x}} =
+\left[\begin{matrix}
+    \frac{dy_1}{dx_1} & \frac{dy_1}{dy_2} & \cdots & \frac{dy_1}{dx_n}\\
+    \frac{dy_2}{dx_1} & \ddots & & \\
+    \vdots & &  & \\
+    \frac{dy_m}{dx_1} & & & \frac{dy_m}{dx_n}
+\end{matrix}\right] =
+\left[\begin{matrix}
+        \uparrow & \uparrow & & \uparrow \\
+        \frac{d\vect{y}}{dx_1} & \frac{d\vect{y}}{x_2} & \cdots & \frac{d\vect{y}}{dx_n} \\
+        \downarrow & \downarrow & & \downarrow
+\end{matrix}\right] =
+\left[\begin{matrix}
+        \leftarrow \frac{dy_1}{d\vect{x}} \rightarrow \\
+        \leftarrow \frac{dy_2}{d\vect{x}} \rightarrow \\
+        \cdots \\
+        \leftarrow \frac{dy_m}{d\vect{x}} \rightarrow \\
+\end{matrix}\right] =
+\textrm{matrix}
+\]
+
+The above is equivalent to the standard form of the Jacobian:
+\[ \frac{d\vect{u}}{d\vect{v}} = \frac{\partial(u_1, \ldots, u_m)}{\partial(v_1, \ldots, v_n)} =
+\left[\begin{matrix}
+    \frac{du_1}{dv_1} & \frac{du_1}{dv_2} & \cdots & \frac{du_1}{dv_n}\\
+    \frac{du_2}{dv_1} & \ddots & & \\
+    \vdots & &  & \\
+    \frac{du_m}{dv_1} & & & \frac{dy_m}{dv_n}
+\end{matrix}\right]
+\]
+
+For matrix $A$ and scalar $\phi$.
+
+\[ {\left[\frac{dA}{d\phi}\right]}_{ij} = \frac{dA_{ij}}{d\phi}
+\quad \textrm{Matching indices}\]
+
+\[ {\left[\frac{d\phi}{dA}\right]}_{ij} = \frac{d\phi}{dA_{ji}}
+\quad \textrm{Opposite indices}\]
+
+As expected, for numerator-layout notation, the matrix indices match when $A$ is the numerator, and are swapped (transpose) when $A$ is the denominator.
+This is equivalent to the fact that when a (column) vector is the denominator, this produces a gradient with the form of the transpose, a row vector.
+
+The matrix derivative is consistent with the form of the derivatives of its columns and rows.
+
+\[ \frac{d\phi}{dA} =
+\left[\begin{matrix}
+    \frac{d\phi}{dA_{11}} & \frac{d\phi}{dA_{21}} & \cdots \\
+    \frac{d\phi}{dA_{12}} & \ddots & \\
+    \vdots & &
+\end{matrix}\right] =
+\left[\begin{matrix}
+        \leftarrow \frac{d\phi}{d\vect{a}_1} \rightarrow \\
+        \leftarrow \frac{d\phi}{d\vect{a}_2} \rightarrow \\
+        \dots \\
+        \leftarrow \frac{d\phi}{d\vect{a}_n} \rightarrow \\
+\end{matrix}\right] =
+\left[\begin{matrix}
+        \uparrow & \uparrow & & \uparrow \\
+    {\left(\frac{d\phi}{d\hat{\vect{a}}_1}\right)}^T &
+    {\left(\frac{d\phi}{d\hat{\vect{a}}_1}\right)}^T &
+    \cdots &
+    {\left(\frac{d\phi}{d\hat{\vect{a}}_1}\right)}^T \\
+        \downarrow & \downarrow & & \downarrow
+\end{matrix}\right]
+\]
+
+ie: Differentiating by the columns of $A$ gives the rows of $\frac{d\phi}{dA}$ and differentiating by the rows of $A$ gives the columns of $\frac{d\phi}{dA}$.
+
+The only reason a transpose is needed around ${\left(\frac{d\phi}{\hat{\vect{a}}_i}\right)}^T$ is because of the convention that all vectors are column vectors. If the rows $\hat{\vect{a}}_i$ were left as row vectors, and differentiating with respect to a row vector gives a column vector, this would naturally fit the columns of $\frac{d\phi}{dA}$.
+
+\subsubsection{Matrix calculus identities}
+
+\end{document}

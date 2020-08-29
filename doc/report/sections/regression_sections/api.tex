@@ -1,0 +1,42 @@
+\documentclass[../../main.tex]{subfiles}
+\begin{document}
+
+API for a Regression model object
+\begin{enumerate}
+    \item \code{construct(parameters)} \\
+        Construct/initialise the object with the specified parameters.
+    \item \code{fit(X, y)} \\
+        Fit the model parameters to the data provided, with inputs X and outputs y.
+    \item \code{predict(x)} \\
+        Given a new input x, return a prediction of y and the variance of the prediction, given fitted parameters.
+\end{enumerate}
+
+API for a Regression manager object
+\begin{enumerate}
+    \item \code{define(feature\_names, output\_name)} \\
+        Receive semantic information about the input features and output, and the number of features expected.
+    \item \code{load\_data(X, y)} \\
+        Receive a dataset with inputs X and outputs y, to be used for training and testing.
+    \item \code{add\_model(model, parameters)} \\
+        Add a model to the list of models to use, with the specified parameters.
+    \item \code{train()} \\
+        Train each model provided by fitting their parameters to the training data. Evaluate the performance of each model against the test data. Determine the best model.
+    \item \code{predict(x)} \\
+        Given a new input x, return the most likely output, using the model which performed best against the training data.
+\end{enumerate}
+
+API for helper functions
+\begin{enumerate}
+    \item \code{describe\_data(regression\_manager)} \\
+        Return a string describing the data loaded into a regression manager.
+    \item \code{plot\_data(regression\_manager, args...)} \\
+        Plot the data loaded into a regression manager, dependent on some arguments.
+    \item \code{describe\_model(regression\_model)} \\
+        Return a string describing a given regression model.
+    \item \code{summarise\_results(regression\_manager)} \\
+        Return a string summarising the results of training the models.
+    \item \code{plot\_results(regression\_manager, args...)} \\
+        Plot information about the results of training, dependent on some arguments.
+\end{enumerate}
+
+\end{document}

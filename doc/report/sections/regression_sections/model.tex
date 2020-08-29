@@ -1,0 +1,40 @@
+\documentclass[../../main.tex]{subfiles}
+\begin{document}
+
+All regression models are the same, just with different transformations of the input vector, $ \tilde{\vect{x}} = \phi{(\vect{x})}$
+
+\textbf{Linear:}
+\[ \phi(\vect{x}) = \left[ 1, x_1, x_2 \ldots x_D \right] \]
+
+\textbf{Polynomial} (order p):
+\[ \phi(\vect{x}) = \left[ 1, x_1, x_1^2 \ldots x_1^p \ldots x_D, x_D^2 \ldots x_D^p \right] \]
+
+\textbf{Gaussian radial basis function} (centres ${\{\vect{c}_k\}}_{k=1}^{K}$, width $l$)
+
+The distance from $\vect{c}_k$ to $\vect{x}$, with scaling $l$ is denoted:
+\[ s(\vect{x}, \vect{c}_k, l) = \sqrt{
+    \frac
+        {{(\vect{x} - \vect{c}_k)}^T{(\vect{x} - \vect{c}_k)}}
+        {l^2}
+    }
+\]
+Elements of $\sigma(\vect{x})$ correspond to mappings of $s(\vect{x}, \vect{c}_k, l)$ with
+\[ \sigma{(\vect{x})}_k = \exp{(-\frac{1}{2}{s(\vect{x}, \vect{c}_k, l)}^2)} \]
+
+Such that (including a $1$ at the start):
+\[ \sigma(\vect{x}) = \left[ 1, \sigma{(\vect{x})}_1 \ldots \sigma{(\vect{x})}_K \right] \]
+
+Define $K$ basis functions, with centres ${\{c_k\}}_{k=1}^{K}$, where $c_k \in \mathbb{R}^D$.
+\[ \phi(\vect{x}) = \left[ 1, x_1, x_1^2 \ldots x_1^p \ldots x_D, x_D^2 \ldots x_D^p \right] \]
+
+\textbf{Model:}
+
+Using the transformed input vector, the output is given by:
+
+\[ y = \vect{w}^T \tilde{\vect{x}} + e\]
+
+The error term $e \sim \mathcal{N}(0, \sigma_e^2)$.
+
+A Gaussian prior is put on the weights: $ w_i \sim  \mathcal{N}(0, \sigma_w^2) $ and therefore $ \vect{w} \sim \mathcal{N}(\vect{0}, \sigma_w^2I)$.
+
+\end{document}

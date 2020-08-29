@@ -1,0 +1,136 @@
+\documentclass[../../main.tex]{subfiles}
+\begin{document}
+
+\subsubsection{Definition}
+
+For a random vector $\vect{X} \in \mathbb{R}^n$, belonging to a Gaussian distribution $\vect{X} \sim \mathcal{N}(\vect{\mu}, \Sigma)$, the pdf is:
+\[
+p_{\vect{X}}(\vect{x}) =
+\frac{1}{\sqrt{{\left(2\pi\right)}^n{\left|\Sigma \right|}}}
+\exp{\left(-\frac{1}{2}{(\vect{x}-\vect{\mu})}^T\Sigma^{-1}(\vect{x}-\vect{\mu})\right)}
+\]
+
+The mean vector $\vect{\mu}$ is defined as:
+\[ \vect{\mu} = \mathbb{E}[\vect{X}] \]
+
+The covariance matrix $\Sigma$ is defined as:
+\begin{align*}
+\Sigma
+&= \mathbb{E}[(\vect{X} - \mathbb{E}[\vect{X}]){(X - \mathbb{E}[\vect{X}])}^T] \\
+&= \mathbb{E}[\vect{X}\vect{X}^T] - 2\mathbb{E}[\vect{X}]{\mathbb{E}[\vect{X}]}^T + \mathbb{E}[\vect{X}]{\mathbb{E}[\vect{X}]}^T \\
+&= \mathbb{E}[\vect{X}\vect{X}^T] - \mathbb{E}[\vect{X}]{\mathbb{E}[\vect{X}]}^T
+\end{align*}
+
+Where: \[
+\Sigma_{ij} = \mathbb{E}[(X_i - \mathbb{E}[X_i])(X_j - \mathbb{E}[X_j])] =
+\begin{cases}
+    \textrm{Var}(X_i) = \sigma_i^2 & i = j \\
+    \textrm{Cov}(X_i, X_j) = \sigma_{i,j} & i \neq j
+\end{cases}
+\]
+
+\subsubsection{Independence}
+
+When the components of a random vector are independent:
+\[ p_{\vect{X}}(\vect{x}) = p_{X_1, \ldots, X_n}(x_1, \ldots, x_N) = \prod_{i=1}^n p_{X_i}(x_i) \]
+
+This can be seen for a multivariate Gaussian, which breaks down into the product of univariate Gaussians. When the components are indepdent, the covariances are all zero, so the covariance matrix becomes diagonal:
+\[ \Sigma = \left[\begin{matrix}
+        \sigma_1^2 & & & \\
+                   & \sigma_2^2 & & \\
+                   & & \ddots & \\
+                   & & & \sigma_n^2
+\end{matrix}\right] \quad\quad
+\Sigma^{-1} = \left[\begin{matrix}
+        1/\sigma_1^2 & & & \\
+                   & 1/\sigma_2^2 & & \\
+                   & & \ddots & \\
+                   & & & 1/\sigma_n^2
+\end{matrix}\right] \quad\quad
+\sqrt{\left|\Sigma\right|} = \prod_{i=1}^n \sigma_i
+\]
+Therefore:
+\[
+{(\vect{x}-\vect{\mu})}^T\Sigma^{-1}(\vect{x}-\vect{\mu}) =
+\sum_{i=1}^n \frac{1}{\sigma_i^2}{(x_i-\mu_i)}^2
+\]
+\begin{align*}
+p_{\vect{X}}(\vect{x})
+&=
+\frac{1}{\sqrt{{\left(2\pi\right)}^n{\left|\Sigma \right|}}}
+\exp{\left(-\frac{1}{2}{(\vect{x}-\vect{\mu})}^T\Sigma^{-1}(\vect{x}-\vect{\mu})\right)} \\
+&=
+\prod_{i=1}^n \left( \frac{1}{\sqrt{2\pi\sigma_i^2}}\right)
+\exp\left({-\frac{1}{2}}
+\sum_{i=1}^n \frac{1}{\sigma_i^2}{(x_i-\mu_i)}^2 \right) \\
+&=
+\prod_{i=1}^n \left( \frac{1}{\sqrt{2\pi\sigma_i^2}}\right)
+\prod_{i=1}^n \exp\left(
+-\frac{{(x_i-\mu_i)}^2}{2\sigma_i^2} \right) \\
+&=
+\prod_{i=1}^n \frac{1}{\sqrt{2\pi\sigma_i^2}}
+\exp \left(
+-\frac{{(x_i-\mu_i)}^2}{2\sigma_i^2} \right) \\
+&=
+\prod_{i=1}^n \mathcal{N}(x_i;\mu_i, \sigma_i^2)
+\end{align*}
+
+\subsubsection{Linear combination}
+
+Any linear combination of Gaussian random variables also belongs to a Gaussian distribution.
+
+To characterise the resultant distribution, just find the mean and covariance of the expression.
+Use the rules for finding the expectation and covariance of a linear sum of random variables, as seen earlier.
+
+\subsubsection{Completing the square}
+
+When finding the form of a probability distribution, the normalisation term can be neglected and found after.
+Only the part of the expression with the variable in it needs to be found.
+
+ie: If $p(x) \propto f(x)$, then $p(x) = \frac{f(x)}{k}$ where $k = \int f(x) dx$.
+
+Additionally, if you know the form of a certain probability distribution, then the normalisation constant is know.
+This is true for the Gaussian distribution.
+
+\begin{align*}
+p(\vect{x})
+&=
+\frac{1}{\sqrt{{(2\pi)}^n|\Sigma|}}
+\exp{\left[-\frac{1}{2}{(\vect{x} - \vect{\mu})}^T\Sigma^{-1}(\vect{x} - \vect{\mu})\right]}\\
+&\propto
+\exp{\left[-\frac{1}{2}(\vect{x}^T\Sigma^{-1}\vect{x} - 2\vect{\mu}^T\Sigma^{-1}\vect{x} + \vect{\mu}^T\Sigma^{-1}\vect{\mu})\right]}\\
+&\propto
+\exp{\left[-\frac{1}{2}(\vect{x}^T\Sigma^{-1}\vect{x} - 2\vect{\mu}^T\Sigma^{-1}\vect{x})\right]}\\
+\end{align*}
+
+Therefore, if you can get a distribution into the following format, then $A = \Sigma^{-1}$, $\vect{b} = \Sigma^{-1}\vect{\mu}$.
+(Recalling $\Sigma$ is symmetric, so $\Sigma = \Sigma^T$)
+
+\[ p_{\vect{X}}(\vect{x}) \propto \exp{\left(-\frac{1}{2}\left[
+\vect{x}^T A\vect{x} - 2\vect{b}^T\vect{x}
+\right]\right)} \]
+
+One useful result from this is:
+\begin{align*}
+\mathcal{N}(\vect{\mu}_3, \Sigma_3)
+&\propto
+\mathcal{N}(\vect{\mu}_1, \Sigma_1)
+\mathcal{N}(\vect{\mu}_2, \Sigma_2) \\
+&\propto
+\exp{\left[-\frac{1}{2}\left[
+    \vect{x}^T\Sigma_1^{-1}\vect{x} - 2\vect{\mu}_1^T\Sigma_1^{-1}\vect{x}
+    + \vect{x}^T\Sigma_2^{-1}\vect{x} - 2\vect{\mu}_2^T\Sigma_2^{-1}\vect{x}
+\right]\right]} \\
+&\propto
+\exp{\left[-\frac{1}{2}\left[
+            \vect{x}^T(\Sigma_1^{-1} + \Sigma_2^{-1})\vect{x} - 2(\vect{\mu}_1^T\Sigma_1^{-1} + \vect{\mu}_2^T\Sigma_2^{-1})\vect{x}
+\right]\right]}
+\end{align*}
+
+Therefore:
+\[ \Sigma_3^{-1} = \Sigma_1^{-1} + \Sigma_2^{-1} \]
+\[ \Sigma_3^{-1}\vect{\mu}_3 = \Sigma_1^{-1}\vect{\mu}_1 + \Sigma_2^{-1}\vect{\mu}_2 \]
+
+ie: The inverse covariance matrices add up, and the resultant mean is a ``weighted average'' of the other means, weighted by the inverse covariance matrices.
+
+\end{document}

@@ -1,0 +1,55 @@
+\documentclass[10pt]{article}
+\usepackage[utf8]{inputenc}
+
+% ===== Packages =====
+
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{float}
+\usepackage[margin=2cm]{geometry}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{bm}
+\usepackage{enumitem}
+\usepackage{pdfpages}
+\usepackage{minted}
+\usepackage{amssymb}
+\usepackage{subfiles}
+
+% ===== Preamble =====
+
+\title{Documentation for my machine learning library}
+\author{Zach Lambert}
+\makeatletter
+
+\parindent 0pt
+\parskip 10pt
+
+\usepackage{ml_maths}
+
+% ===== Title =====
+
+\begin{document}
+
+\begin{centering}
+\huge{\@title}
+
+\large{\@author}
+
+\end{centering}
+
+% ===== Start of main content =====
+
+\section{Overview}
+\subfile{sections/overview}
+
+\section{Useful mathematics}
+\subfile{sections/maths.tex}
+
+\section{Regression}
+\subfile{sections/regression}
+
+\end{document}

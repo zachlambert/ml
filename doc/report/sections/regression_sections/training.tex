@@ -1,0 +1,209 @@
+\documentclass[../../main.tex]{subfiles}
+\begin{document}
+
+A Bayesian, maximum a posterior (MAP) method is used.
+
+The training data is denoted $\mathcal{D} = {\{\vect{x}_n, y_n\}}_{n=1}^N$.
+
+A new input vector is denoted $\vect{x}_*$ with the corresponding prediction $y_*$.
+
+Fitting the data requires characterising the posterior of the parameters, $p(\vect{w} | \mathcal{D})$.
+
+Making predictions requires characterising the predictive distribution for a new data point, $p(y_* | \vect{x}_*, \mathcal{D})$.
+This will have a Gaussian form, where the mean represents the most likely prediction, and the variance represents the uncertainty in the distribution.
+
+\subsubsection{What is the format of the posterior?}
+
+Use Bayes rule to expand the posterior $p(\vect{w} | \mathcal{D})$ and ignore constant terms.
+
+\begin{align*}
+p(\vect{w} | \mathcal{D}) &=
+    p(\vect{w} | {\{\vect{x}_n, y_n\}}_{n=1}^N) \\
+p(\vect{w} | \mathcal{D}) &=
+    \frac
+        {p({\{y_n\}}_{n=1}^N | {\{x_n\}}_{n=1}^N, \vect{w})
+            p(\vect{w})}
+        {p({\{y_n\}}_{n=1}^N | {\{x_n\}}_{n=1}^N)} \\
+p(\vect{w} | \mathcal{D}) &\propto
+    p({\{y_n\}}_{n=1}^N | {\{x_n\}}_{n=1}^N, \vect{w})
+    p(\vect{w})
+\end{align*}
+
+The posterior $p(\vect{w} | \mathcal{D})$ represents the actual probability of the weights, after observing a set of data.
+It is proportional the likelihood of the parameters $p({\{y_n\}}_{n=1}^N | {\{X_n\}}_{n=1}^N, \vect{w})$ which represents the probability of the weights based solely on the data, and the prior $p(\vect{w})$ which represents a prior belief on how likely the weights are.
+ie: We expect it to be more likely that the weights are small than large and a Gaussian prior represents this well.
+
+\subsubsection{Calculating the likelihood}
+
+Using the model:
+\[ y_n = \vect{w}^T\tilde{\vect{x}} + e \]
+Since $e$ is follows a Gaussian distribution with $p(e) = \mathcal{N}(0, \sigma_e^2$), $y_n$ must also follow a Gaussian distribution (any linear combination of Gaussian variables is also a Gaussian), with:
+\[ \mathbb{E}[y_n] = \vect{w}^T\tilde{\vect{x}} \quad\quad \mathbb{V}[y_n] = \sigma_e^2 \]
+Therefore:
+\[ p(y_n | \vect{x}_n , \vect{w}) = \mathcal{N}(y_n ; \vect{w}^T\tilde{\vect{x}}, \sigma_e^2) = \frac{1}{\sqrt{2\pi \sigma_e^2}}\exp{\left(-\frac{1}{2}\frac{{(y_n - \vect{w}^T\tilde{\vect{x}})}^2}{\sigma_e^2}\right)}\]
+
+\[ p({\{y_n\}}_{n=1}^N | {\{x_n\}}_{n=1}^N, \vect{w}) =
+\prod_{n=1}^N p(y_n | \vect{x}_n , \vect{w}) \propto
+\exp{\left(
+    -\frac{1}{2\sigma_e^2}
+    \sum_{n=1}^N {(y_n - \vect{w}^T\tilde{\vect{x}})}^2
+\right)}
+\]
+Again, we can neglect the constant factor at the front. The above can be simplified by using:
+\begin{align*}
+\sum_{n=1}^N {(y_n - \vect{w}^T\tilde{\vect{x}})}^2 =
+{(\vect{y} - \tilde{X}^T\vect{w})}^T {(\vect{y} - \tilde{X}^T\vect{w})}
+\end{align*}
+Where:
+\[ \tilde{X}^T =
+\left[ \begin{matrix}
+    \uparrow & \uparrow & & \uparrow \\
+    \tilde{\vect{x}}_1 & \tilde{\vect{x}}_2 & \cdots & \tilde{\vect{x}}_N \\
+    \downarrow & \downarrow & & \downarrow
+\end{matrix} \right]
+\]
+
+This gives:
+\begin{align*}
+p({\{y_n\}}_{n=1}^N | {\{x_n\}}_{n=1}^N, \vect{w})
+&\propto \exp{\left(
+    -\frac{1}{2\sigma_e^2}
+    {(\vect{y} - \tilde{X}^T\vect{w})}^T {(\vect{y} - \tilde{X}^T\vect{w})}
+\right)} \\
+&\propto \exp{\left(
+    -\frac{1}{2\sigma_e^2}
+    \left[ \vect{y}^T\vect{y} - 2\vect{y}^T\tilde{X}^T\vect{w} + \vect{w}^T\tilde{X}\tilde{X}^T\vect{w} \right]
+\right)} \\
+&\propto \exp{\left(
+    -\frac{1}{2}
+    \left[ \vect{w}^T\frac{\tilde{X} \tilde{X}^T}{\sigma_e^2}\vect{w} - 2\frac{{(\tilde{X}\vect{y})}^T}{\sigma_e^2} \vect{w} \right]
+\right)}
+\end{align*}
+
+Here, ``using completing the square'', the distribution is in the form of a Gaussian distribution, and therefore we can see that the mean and covariance of the resultant distribution are:
+
+\[\Sigma^{-1} = \tilde{X}\tilde{X}^T\sigma_e^{-2}\]
+\[\Sigma^{-1}\vect{\mu} = \tilde{X}\vect{y}\sigma_e^{-2}\]
+\[\tilde{X}\tilde{X}^T\sigma_e^{-2}\vect{\mu} = \tilde{X}\vect{y}\sigma_e^{-2}\]
+\[\vect{\mu} = {(\tilde{X}\tilde{X}^{-1})}^{-1}\tilde{X}\vect{y}\]
+
+This gives the final result for the likelihood:
+\[
+p({\{y_n\}}_{n=1}^N | {\{x_n\}}_{n=1}^N, \vect{w}) =
+\mathcal{N}(\vect{w}; \vect{\mu}, \Sigma)
+\]
+\[
+\vect{\mu} = {(\tilde{X}\tilde{X}^T)}^{-1} \tilde{X} \vect{y}
+\quad\quad
+\Sigma = {(\tilde{X}\tilde{X}^T)}^{-1}\sigma_e^2
+\]
+
+\subsubsection{Calculating the posterior}
+
+\[
+p(\vect{w} | \mathcal{D}) \propto
+    p({\{y_n\}}_{n=1}^N | {\{x_n\}}_{n=1}^N, \vect{w})
+    p(\vect{w})
+\]
+All probability distributions above are Gaussian.
+\[
+\mathcal{N}(\vect{w};\vect{\mu}_w, \Sigma_w)
+\propto
+\mathcal{N}(\vect{w};\vect{\mu}_{ML}, \Sigma_{ML})
+\mathcal{N}(\vect{w};\vect{0}, \sigma_w^2I)
+\]
+The parameters of the likelihood have been renamed to $\vect{\mu}_{ML}$ and $\Sigma_{ML}$ for maximum likelihood.
+The posterior parameters have been defined as $\vect{\mu}_w$ and $\Sigma_w$, since the posterior represents the final distribution for the weights $\vect{w}$ given the prior and observed data.
+
+To determine $\vect_{\mu}$ and $\Sigma_{\mu}$, completing the square is used again.
+However, the general result can be referred to.
+
+Where:
+\[ \mathcal{N}(\vect{\mu}_3, \Sigma_3) \propto \mathcal{N}(\vect{\mu}_1, \Sigma_1)\mathcal{N}(\vect{\mu}_2, \Sigma_2) \]
+The parameters of Gaussian 3 are given by:
+\[ \Sigma_3^{-1} = \Sigma_1^{-1} + \Sigma_2^{-1} \]
+\[ \Sigma_3^{-1}\vect{\mu}_3 = \Sigma_1^{-1}\vect{\mu}_1 + \Sigma_2^{-1}\vect{\mu}_2 \]
+
+Using this for the posterior, we get:
+
+\begin{align*}
+    \Sigma_w^{-1} &= \Sigma_{ML}^{-1} + I\sigma_w^{-2} \\
+    &= \tilde{X}\tilde{X}^T\sigma_e^{-2} + I\sigma_w^{-2} \\
+    &= (\tilde{X}\tilde{X}^T + \lambda I)\sigma_e^{-2} \\
+    \Sigma_w &= {(\tilde{X}\tilde{X}^T + \lambda I)}^{-1}\sigma_e^2
+\end{align*}
+
+\[ \Sigma_w^{-1}\vect{\mu}_w = \Sigma_{ML}^{-1}\vect{\mu}_{ML} \]
+\[ \Sigma_w^{-1} \vect{\mu}_w =
+\left( \tilde{X}\tilde{X}^T\sigma_e^{-2} \right)
+\left( {(\tilde{X}\tilde{X}^T)}^{-1}\tilde{X}\vect{y} \right) \]
+\[ \Sigma_w^{-1} \vect{\mu}_w =
+\sigma_e^{-2}\tilde{X}\vect{y}
+\]
+\[ \vect{\mu}_w =
+\left( {(\tilde{X}\tilde{X}^T + \lambda I)}^{-1}\sigma_e^2 \right)
+\sigma_e^{-2}\tilde{X}\vect{y}
+\]
+\[ \vect{\mu}_w =
+{(\tilde{X}\tilde{X}^T + \lambda I)}^{-1}\tilde{X}\vect{y}
+\]
+
+$\lambda$ has been defined as $\sigma_e^2 / \sigma_w^2$, the ratio of the variance of the model error to the variance of the prior.
+This represents the uncertainty of the model relative to the prior.
+The larger the variance of the model compared to the variance of the prior, the more likely it is that large observations $y$ are a result of the error term than the weights $\vect{w}$, leading the model to prefer smaller weights.
+
+Essentially, the larger $\lambda$ is, the less trust is put in the model, and the less likely it is to be overfitted.
+
+
+\subsubsection{Calculating the predictive distribution}
+
+We want to calculate the predictive distribution $p(y_* \ \vect{x}_*, \mathcal{D})$.
+The long way to do this would be:
+\begin{align*}
+    p(y_* | \vect{x}_*, \mathcal{D})
+    &= \int p(y_*, \vect{w} | \vect{x}_*, \mathcal{D}) \vect{dw} \\
+    &= \int p(y_* | \vect{x}_*, \vect{w})p(\vect{w} | \mathcal{D}) \vect{dw} \\
+    &= \int \mathcal{N}(y_*; \vect{w}^T\tilde{\vect{x}}_*, \sigma_e^2)\mathcal{N}(\vect{w};\vect{\mu}_w, \Sigma_w) \vect{dw} \\
+    &= \ldots
+\end{align*}
+
+The quick way is to make use of the fact that a linear combination of Gaussian variables is also Gaussian.
+\[ y_* = \vect{w}^T\tilde{\vect{x}}_* + e \]
+$\vect{w}^T$ and $e$ are both Gaussian, so $y_*$ must be Gaussian with mean $\mu_y$ and variance $\sigma_y^2$, where:
+
+\[
+\mu_y = \mathbb{E}[y_*] = {\mathbb{E}[\vect{w}]}^T\tilde{\vect{x}}_* + \mathbb{E}[e] = \vect{\mu}_w^T\tilde{\vect{x}}_*
+\]
+
+\[
+    \sigma_y^2 = \mathbb{V}[y_*] = \mathbb{V}[\tilde{\vect{x}}_*^T\vect{w}] + \sigma_e^2 = \tilde{\vect{x}}_*^T\Sigma_w\tilde{\vect{x}} + \sigma_e^2
+\]
+
+Therefore the predictive distribution is given by:
+\[ p(y_* \ \vect{x}_*, \mathcal{D}) =
+\mathcal{N}(y_* ; \mu_y, \sigma_y^2)\]
+\[
+\mu_y = \vect{\mu}_w^T\tilde{\vect{x}}_* \quad\quad
+\sigma_y^2 = \tilde{\vect{x}}_*^T \Sigma_w \tilde{\vect{x}}_* + \sigma_e^2
+\]
+
+This allows you to give a prediction as the mean $y_*$ over the predictive distribution, which is just equal to $\mu_y$, so give the prediction:
+\[ y_* = \vect{\mu}_w^T\tilde{x}_* \]
+And the variance of the estimate can be returned as a level of uncertainty of the estimate:
+\[ \textrm{Uncertainty } \sigma_y^2 = \tilde{\vect{x}}_*^T \Sigma_w \tilde{\vect{x}}_* + \sigma_e^2
+\]
+
+Finally, a useful statistic is to give a confidence interval for the estimate.
+
+For a Gaussian random variable $X$, a confidence interval of (eg) 90\% is defined as $\mu \pm \sigma z$, where:
+\[ P(X \in [\mu - \sigma z, \mu + \sigma z]) = 0.9 \]
+\[ P(X > \mu - \sigma z , X < \mu + \sigma z) = 0.9 \]
+\[ P(X < \mu + \sigma z) = 0.95 \]
+\[ P(Z < z) = 0.95 \]
+\[ \phi(z) = 0.95 \]
+In general, for a confidence interval of $100(1 - \alpha)\%$, $z$ is given by $\phi(z) = 1 - \frac{\alpha}{2}$.
+
+Therefore, a $100(1 - \alpha)\%$ confidence interval for $y_*$ is given by:
+\[ \mu_y \pm \sigma_y z \quad\quad \phi(z) = 1 - \frac{\alpha}{2}\]
+
+\end{document}
