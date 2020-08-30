@@ -253,19 +253,20 @@ Substituting this all back into the gradient:
 Start with:
 \[ W[0] = 0 \]
 Iterate:
-\[ W[i+1] = W[i] - \eta {\left(\frac{d\mathcal{C}}{dW}\right)}^T \]
-\[ W[i+1] = W[i] - \eta\left(\tilde{X}{(P - Y)}^T + \frac{1}{\sigma_w^2}W\right)\]
+\[ W[i+1] = W[i] - \eta {\left(\frac{d\mathcal{C}}{dW}[i]\right)}^T \]
+\[ W[i+1] = W[i] - \eta\left(\tilde{X}{(P[i] - Y)}^T + \frac{1}{\sigma_w^2}W[i]\right)\]
 Until convergence, where:
 \[ {\left|\left|\frac{d\mathcal{C}}{dW}\right|\right|}_F < \epsilon \]
 Where $\eta$ is the learning rate and $\epsilon$ is some threshold for the gradient norm.
 
 ${\left|\left|\frac{d\mathcal{C}}{dW}\right|\right|}_F$ is the Frobenius norm, and is defined as:
 \[ ||A||_F = \sqrt{\sum_i\sum_j A_{ij}^2} \]
-It is just a sum of the $L_2$ norms of the columns (or rows):
+It is just the mean squared sum of the $L_2$ norms of the columns (or rows):
 \begin{align*}
 ||A||_F^2 &= \sum_i\sum_j A_{ij}^2 \\
           &= \sum_j \sum_i {[\vect{a}_j]}_i^2 \\
           &= \sum_j |\vect{a}_j|^2 \\
 \end{align*}
+Therefore, the Frobenius norm is suitable since it is giving the mean squared sum of the norms of the gradients with respect to the individual weight vectors, which are what we want to measure the size of.
 
 \end{document}

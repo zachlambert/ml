@@ -33,22 +33,25 @@ class ModelLinear:
     def fit(self, X, y):
         if self.transform == "gaussian_radial_basis":
             self._transform_X = make_transform_X_radial_basis(
-                X, np.full(X.shape[0], self.basis_width)
+                X, np.full(X.shape[1], self.basis_width)
             )
         X_tilde = self._transform_X(X)
-        A = np.matmul(np.transpose(X_tilde), X_tilde) \
-            + self.var_ratio*np.eye(X_tilde.shape[1])
+        A = np.matmul(X_tilde, np.transpose(X_tilde)) \
+            + self.var_ratio*np.eye(X_tilde.shape[0])
         A_inv = np.linalg.inv(A)
         # If computing the full inverse is numerically unstable, consider
         # trying a low rank approximation of the inverse
         # A_inv = approximate_inverse(A)
-        self.w_mean = np.matmul(np.matmul(A_inv, np.transpose(X_tilde)), y)
+        self.w_mean = np.matmul(np.matmul(A_inv, X_tilde), y)
         self.w_covar = self.var_e * A
 
     def predict(self, X):
         X_tilde = self._transform_X(X)
-        y_pred = np.matmul(X_tilde, self.w_mean)
-        y_var = dot_products(X_tilde, np.matmul(X_tilde, self.w_covar))
+        y_pred = np.matmul(np.transpose(X_tilde), self.w_mean)
+        y_var = dot_products(
+            np.transpose(X_tilde),
+            np.matmul(np.transpose(X_tilde), self.w_covar)
+        )
         return y_pred, y_var
 
     def __repr__(self):

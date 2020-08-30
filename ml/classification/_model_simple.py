@@ -9,8 +9,8 @@ from ml.common.optimisation import (
 )
 
 
-def _P_matrix(X_tilde, params):
-    P = np.exp(np.matmul(np.transpose(params), X_tilde))
+def _P_matrix(X_tilde, W):
+    P = np.exp(np.matmul(np.transpose(W), X_tilde))
     P = np.divide(P, np.sum(P, axis=0))
     return P
 
@@ -40,7 +40,7 @@ class ModelSimple:
         else:
             raise TypeError("Invalid transform name passed.")
 
-        self.params = None
+        self.W = None
 
     def fit(self, X, y):
         if self.transform == "gaussian_radial_basis":
@@ -50,18 +50,18 @@ class ModelSimple:
         X_tilde = self._transform_X(X)
         Y = _Y_matrix(y)
 
-        def cost_gradient_T(params):
+        def cost_gradient_T(W):
             return np.matmul(X_tilde,
-                             np.transpose(_P_matrix(X_tilde, params) - Y)) \
-                   + (1/self.var_w**2)*params
+                             np.transpose(_P_matrix(X_tilde, W) - Y)) \
+                   + (1/self.var_w**2)*W
 
-        self.params = gradient_descent_matrix(
+        self.W = gradient_descent_matrix(
             cost_gradient_T, (self.D, self.C), self.learning_rate
         )
 
     def predict(self, X):
         X_tilde = self._transform_X(X)
-        P_matrix_pred = _P_matrix(X_tilde, self.params)
+        P_matrix_pred = _P_matrix(X_tilde, self.W)
         y_pred = np.argmax(P_matrix_pred)
         y_prob = P_matrix_pred[y_pred]
         return y_pred, y_prob

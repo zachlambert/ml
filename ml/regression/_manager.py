@@ -18,9 +18,9 @@ class Manager:
         self.models_best = None
 
     def load_data(self, X, y):
-        assert X.shape[1] == self.D
+        assert X.shape[0] == self.D
         self.X = X
-        self.N = X.shape[0]
+        self.N = X.shape[1]
         assert y.shape[0] == self.N
         if len(y.shape) == 1:
             self.y = y.reshape(self.N, 1)
