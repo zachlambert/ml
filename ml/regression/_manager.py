@@ -55,16 +55,16 @@ class Manager:
 
     @property
     def X_train(self):
-        return self.X[:int(self.train_proportion * self.X.shape[0])]
+        return self.X[:, :int(self.train_proportion * self.X.shape[1])]
 
     @property
     def y_train(self):
-        return self.y[:int(self.train_proportion * self.y.shape[0])]
+        return self.y[:, :int(self.train_proportion * self.y.shape[1])]
 
     @property
     def X_test(self):
-        return self.X[int(self.train_proportion * self.X.shape[0]):]
+        return self.X[:, int(self.train_proportion * self.X.shape[1]):]
 
     @property
     def y_test(self):
-        return self.y[int(self.train_proportion * self.y.shape[0]):]
+        return self.y[:, int(self.train_proportion * self.y.shape[1]):]

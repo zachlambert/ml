@@ -21,9 +21,9 @@ class Manager:
         self.models_best = None
 
     def load_data(self, X, y):
-        assert X.shape[1] == self.D
+        assert X.shape[0] == self.D
         self.X = X
-        self.N = X.shape[0]
+        self.N = X.shape[1]
         assert y.shape[0] == self.N
         assert(type(y.dtype) == int)
         assert(np.logical_and(y >= 1, y <= self.C).all())
@@ -69,16 +69,16 @@ class Manager:
 
     @property
     def X_train(self):
-        return self.X[:int(self.train_proportion * self.X.shape[0])]
+        return self.X[:, :int(self.train_proportion * self.X.shape[1])]
 
     @property
     def y_train(self):
-        return self.y[:int(self.train_proportion * self.y.shape[0])]
+        return self.y[:, :int(self.train_proportion * self.y.shape[1])]
 
     @property
     def X_test(self):
-        return self.X[int(self.train_proportion * self.X.shape[0]):]
+        return self.X[:, int(self.train_proportion * self.X.shape[1]):]
 
     @property
     def y_test(self):
-        return self.y[int(self.train_proportion * self.y.shape[0]):]
+        return self.y[:, int(self.train_proportion * self.y.shape[1]):]

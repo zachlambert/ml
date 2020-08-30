@@ -13,32 +13,25 @@ class ArtificialDataset:
     def generate_X_gaussian(self, D, N, mean=None, cov=None):
         mean = mean if mean is not None else np.zeros(D)
         cov = cov if cov is not None else np.eye(D)
-        self.X = np.random.multivariate_normal(mean, cov, N)
+        self.X = np.transpose(np.random.multivariate_normal(mean, cov, N))
 
     def generate_X_uniform(self, D, N, low=None, high=None):
         low = low if low is not None else np.zeros(D)
         high = high if high is not None else np.ones(D)
-        self.X = np.random.uniform(low, high, (N, D))
+        self.X = np.transpose(np.random.uniform(low, high, (N, D)))
 
     def generate_y(self, transform_X):
         X_tilde = transform_X(self.X)
 
-        # Initialise a vector to hold the pmf of y for each data point
-        py = np.zeros((self.N, self.C))
-        # Initialise a matrix to hold the weight vectors (as rows)
-        W = np.zeros(self.C, self.D)
+        W = np.zeros(self.D, self.C)
         for c in range(self.C):
-            # Randomly generate a weight for this class
-            W[c] = np.random.normal(0, 1, X_tilde.shape[1])
-            # Calculate the linear combination for each data point
-            z = np.matmul(X_tilde, W[c])
-            py[:, c] = np.exp(z)
+            W[:, c] = np.random.normal(0, 1, X_tilde.shape[0])
 
-        # Normalise the pdf for each data point
-        py = np.divide(py, np.reshape(np.sum(py, axis=1), (self.N, 1)))
+        P = np.exp(np.matmul(np.transpose(W), X_tilde))
+        P = np.divide(P, np.sum(P, axis=0))
 
         # Get the cumulative distribution
-        fy = np.cumsum(py, axis=1)
+        F = np.cumsum(P, axis=0)
 
         # Want to generate a set of labels y, according to the pmf of y
         # Therefore, generate a uniform random variable for eac data point
@@ -49,7 +42,7 @@ class ArtificialDataset:
         # on the cmf below the sample value. The label to select is equal
         # to the index of the first cdf value above the sample, which
         # is equivalent to the total number of cdf values below the sample
-        self.y = np.sum(np.less(fy, samples.reshape(self.N, 1)), axis=1)
+        self.y = np.sum(np.less(F, samples), axis=0)
         return W
 
     def generate_y_linear(self):
