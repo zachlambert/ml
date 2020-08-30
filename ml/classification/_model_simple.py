@@ -4,12 +4,22 @@ from ml.common.transform import (
     make_transform_X_polynomial,
     make_transform_X_radial_basis,
 )
-from ml.common.maths import (
-    dot_products
-)
 from ml.common.optimisation import (
-    gradient_descent
+    gradient_descent_matrix
 )
+
+
+def _P_matrix(X_tilde, params):
+    P = np.exp(np.matmul(np.transpose(params), X_tilde))
+    P = np.divide(P, np.sum(P, axis=0))
+    return P
+
+
+def _Y_matrix(y, C):
+    Y = np.zeros(C, y.size)
+    for i, c in enumerate(y):
+        Y[c, i] = 1
+    return Y
 
 
 class ModelSimple:
@@ -38,16 +48,22 @@ class ModelSimple:
                 X, np.full(X.shape[0], self.basis_width)
             )
         X_tilde = self._transform_X(X)
+        Y = _Y_matrix(y)
 
-        def cost_gradient(params):
-            pass
+        def cost_gradient_T(params):
+            return np.matmul(X_tilde,
+                             np.transpose(_P_matrix(X_tilde, params) - Y)) \
+                   + (1/self.var_w**2)*params
 
-        return gradient_descent(
-            cost_gradient, self.D*self.C, self.learning_rate
+        self.params = gradient_descent_matrix(
+            cost_gradient_T, (self.D, self.C), self.learning_rate
         )
 
     def predict(self, X):
         X_tilde = self._transform_X(X)
+        P_matrix_pred = _P_matrix(X_tilde, self.params)
+        y_pred = np.argmax(P_matrix_pred)
+        y_prob = P_matrix_pred[y_pred]
         return y_pred, y_prob
 
     def __repr__(self):

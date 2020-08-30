@@ -1,0 +1,271 @@
+\documentclass[../../main.tex]{subfiles}
+\begin{document}
+
+Unlike regression, which has a simple linear form, doing a full Bayesian analysis is more difficult.
+
+Therefore, the classification model is trained by finding the parameters which maximise the posterior:
+
+\begin{align*}
+\theta^*
+&= \argmax_{\theta}\left[p(\theta | \mathcal{D}) \right] \\
+&= \argmax_{\theta}\left[\ln p(\theta | \mathcal{D}) \right] \\
+&= \argmax_{\theta}\left[\ln p({\{y_n\}}_{n=1}^N|{\{\tilde{\vect{x}}_n\}}_{n=1}^N, \theta) + \ln p(\theta) \right] \\
+&= \argmax_{\theta}\left[\mathcal{L}(\theta) + \ln p(\theta) \right] \\
+&= \argmin_{\theta}\left[\mathcal{C}(\theta)\right]
+\end{align*}
+
+$\mathcal{L} = \ln p({\{y_n\}}_{n=1}^N|{\{\tilde{\vect{x}}_n\}}_{n=1}^N, \theta)$ is defined as the log-likelihood of the parameters.
+The cost $\mathcal{C}(\theta)$ is the expression we need to minimise in order to optimise the parameters, where:
+\[ \mathcal{C}(\theta) = -\mathcal{L}(\theta) - \ln p(\theta)\]
+
+Optimisation is performed as a minimisation problem, simply because this is the conventional method, so standard methods perform minimisation of an expression.
+
+The expression for $\mathcal{C}(\theta)$ cannot be minimised analytically, so instead gradient descent is used.
+This only requires that the gradient of the cost with respect to the parameters can be found.
+
+\subsubsection{Finding the log-likelihood}
+
+Some terms which will be used later:
+\[ \tilde{X} = \left[\begin{matrix}
+    \uparrow & \uparrow & & \uparrow \\
+    \tilde{\vect{x}}_1 &
+    \tilde{\vect{x}}_2 &
+    \cdots &
+    \tilde{\vect{x}}_N \\
+    \downarrow & \downarrow & & \downarrow
+\end{matrix}\right] \]
+
+\[ W = \left[\begin{matrix}
+    \uparrow & \uparrow & & \uparrow \\
+    \vect{w}_1 &
+    \vect{w}_2 &
+    \cdots &
+    \vect{w}_C \\
+    \downarrow & \downarrow & & \downarrow
+\end{matrix}\right] \]
+
+\[ \textrm{Discrete delta function  } \delta_c(y) =
+\begin{cases}
+1 & c = y \\
+0 & c \neq y
+\end{cases}
+\]
+
+\[ \vect{y} = \left[\begin{matrix}
+    \delta_1(y) \\
+    \delta_2(y) \\
+    \vdots \\
+    \delta_C(y)
+\end{matrix}\right]
+\quad
+\textrm{ie:}\quad {[\vect{y}]}_c =
+\begin{cases}
+1 & c = y \\
+0 & c \neq y
+\end{cases}
+\]
+
+\[ Y = \left[\begin{matrix}
+    \uparrow & \uparrow & & \uparrow \\
+    \vect{y}_1 & \vect{y}_2 & \cdots & \vect{y}_N \\
+    \downarrow & \downarrow & & \downarrow
+\end{matrix}\right]\]
+
+\[ \vect{p}_n = \left[\begin{matrix}
+        p_Y(1|\tilde{\vect{x}}_n) \\
+        p_Y(2|\tilde{\vect{x}}_n) \\
+        \vdots \\
+        p_Y(C|\tilde{\vect{x}}_n)
+\end{matrix}\right]\]
+
+\[ P = \left[\begin{matrix}
+    \uparrow & \uparrow & & \uparrow \\
+    \vect{p}_1 & \vect{p}_2 & \cdots & \vect{p}_N \\
+    \downarrow & \downarrow & & \downarrow
+\end{matrix}\right]\]
+
+Expanding the log-likelihood:
+
+\begin{align*}
+\mathcal{L}(\theta)
+&= \ln p({\{y_n\}}_{n=1}^N|{\{\tilde{\vect{x}}_n\}}_{n=1}^N, \theta) \\
+&= \ln \prod_{n=1}^N p(y_n | \tilde{\vect{x}}_n, \theta) \\
+&= \sum_{n=1}^N \ln p(y_n | \tilde{\vect{x}}_n, \theta)
+\end{align*}
+
+Before expanding out the pdf, the following results can be used:
+\[ \vect{w}_y^T\tilde{\vect{x}} = {(W\vect{y})}^T\tilde{\vect{x}}\]
+
+Now, expanding the pdf:
+\begin{align*}
+p(y_n | \tilde{\vect{x}}_n, \theta)
+&=
+\frac{\exp{\left(\vect{w}_{y_n}^T\tilde{\vect{x}}_n\right)}}{\sum_{c=1}^C \exp{\left(\vect{w}_c^T\tilde{\vect{x}}_n\right)} } \\
+&=
+\frac{\exp{\left({(W\vect{y}_n)}^T\tilde{\vect{x}}_n\right)}}{\sum_{c=1}^C \exp{\left(\vect{w}_c^T\tilde{\vect{x}}_n\right)} }
+\end{align*}
+
+\begin{align*}
+\ln p(y_n | \tilde{\vect{x}}_n, \theta)
+&=
+{(W\vect{y}_n)}^T\tilde{\vect{x}}_n - \ln \sum_{c=1}^C \exp{\left(\vect_c{w}^T\tilde{\vect{x}_n}\right)}
+\end{align*}
+
+Finally:
+\[ \mathcal{L}(\theta) =
+\sum_{n=1}^N \left\{{(W\vect{y}_n)}^T\tilde{\vect{x}}_n - \ln \sum_{c=1}^C \exp{\left(\vect_c{w}^T\tilde{\vect{x}_n}\right)} \right\}
+\]
+
+\subsubsection{Finding the prior}
+
+Each weight has the same prior, a multivariate Gaussian with covariance matrix $\sigma_w^2I$.
+
+\begin{align*}
+p(\theta) &= \prod_{c=1}^C p(\vect{w}_c) \\
+          &\propto \prod_{c=1}^C \exp{\left(-\frac{\vect{w}_c^T\vect{w}_c}{2\sigma_w^2}\right)}
+\end{align*}
+
+\begin{align*}
+    \ln p(\theta) &= - \sum_{c=1}^C \frac{\vect{w}_c^T\vect{w}_c}{2\sigma_w^2} + \textrm{const}
+\end{align*}
+
+And because we only care about optimising over the parameters, constants can be removed from the cost.
+
+\subsubsection{Expression for the cost}
+
+\begin{align*}
+\mathcal{C}(\theta)
+&=
+- \mathcal{L}(\theta) - \ln p(\theta) \\
+&=
+\sum_{n=1}^N \left\{-{(W\vect{y}_n)}^T\tilde{\vect{x}}_n + \ln \sum_{c=1}^C \exp{\left(\vect{w}_c^T\tilde{\vect{x}_n}\right)} \right\}
++ \sum_{c=1}^C \frac{\vect{w}_c^T\vect{w}_c}{2\sigma_w^2}
+\end{align*}
+
+\subsubsection{Gradient of the cost}
+
+To encapsulate the gradient over all parameters, the matrix derivative of the cost can be found, with respect to $W$.
+\begin{align*}
+\frac{d\mathcal{C}}{dW}
+&=
+\sum_{n=1}^N \left\{ -\vect{y}_n \tilde{\vect{x}}_n^T
++ \frac
+    {\frac{d}{dW}\left(\sum_{c=1}^C \exp{\left(\vect{w}_c^T\tilde{\vect{x}}_n\right)}\right)}
+    {\sum_{c=1}^C \exp{\left(\vect{w}_c^T\tilde{\vect{x}}_n\right)}}
+\right\}
++ \frac{1}{2\sigma_w^2} \sum_{c=1}^C \frac{d}{dW}(\vect{w}_c^T\vect{w}_c) \\
+&=
+- \sum_{n=1}^N \left\{ \vect{y}_n \tilde{\vect{x}}_n^T \right\}
++ \sum_{n=1}^N \sum_{c=1}^C \left\{
+    \frac{d}{dW}\left[\vect{w}_c^T\tilde{\vect{x}}_n \right]
+    \frac
+        {\exp{\left(\vect{w}_c^T\tilde{\vect{x}}_n\right)}}
+    {\sum_{k=1}^C \exp{\left(\vect{w}_k^T\tilde{\vect{x}}_n\right)}}
+\right\}
++ \frac{1}{2\sigma_w^2} \sum_{c=1}^C \frac{d}{dW}[\vect{w}_c^T\vect{w}_c] \\
+&=
+- Y\tilde{X}^T
++ \sum_{n=1}^N \sum_{c=1}^C \left\{
+    \frac{d}{dW}\left[\vect{w}_c^T\tilde{\vect{x}}_n \right]
+    p(c|\tilde{\vect{x}}_n)
+\right\}
++ \frac{1}{2\sigma_w^2} \sum_{c=1}^C \frac{d}{dW}[\vect{w}_c^T\vect{w}_c] \\
+\end{align*}
+
+Tackling the more complex expression
+
+\[
+\sum_{c=1}^C \left\{
+    \frac{d}{dW}\left[\vect{w}_c^T\tilde{\vect{x}}_n \right]
+    p(c|\tilde{\vect{x}}_n)
+\right\}
+\]
+\[
+\frac{d(\vect{w}_c^T\tilde{\vect{x}}_n)}{d\vect{w}_i} =
+\begin{cases}
+    \tilde{\vect{x}}_n^T & c = i \\
+    \vect{0}^T & c \neq i
+\end{cases}
+\]
+\[
+\frac{d(\vect{w}_c^T\tilde{\vect{x}}_n)}{dW} =
+\left[\begin{matrix}
+    \vect{0}^T \\
+    \vdots \\
+    \leftarrow \tilde{\vect{x}}_n^T \rightarrow \\
+    \vdots \\
+    \vect{0}^T
+\end{matrix}\right]
+\begin{matrix} \\ \textrm{(c'th row)} \\ \\ \end{matrix}
+\]
+\[
+\sum_{c=1}^C \left\{
+    \frac{d}{dW}\left[\vect{w}_c^T\tilde{\vect{x}}_n \right]
+    p(c|\tilde{\vect{x}}_n)
+\right\} =
+\left[\begin{matrix}
+    p(1|\tilde{\vect{x}}_n)\tilde{\vect{x}}_n^T \\
+    p(2|\tilde{\vect{x}}_n)\tilde{\vect{x}}_n^T \\
+    \vdots \\
+    p(C|\tilde{\vect{x}}_n)\tilde{\vect{x}}_n^T
+\end{matrix}\right] =
+\vect{p}_n\tilde{\vect{x}}_n^T
+\]
+\[
+\sum_{n=1}^N \sum_{c=1}^C \left\{ \ldots \right\} =
+\sum_{n=1}^N \vect{p}_n\tilde{\vect{x}}_n^T = P\tilde{X}^T
+\]
+
+Then, the expression which comes from the prior:
+\[ \frac{d(\vect{w}_c^T\vect{w}_c)}{d\vect{w}_i} =
+\begin{cases}
+    2\vect{w}_c^T & i = c \\
+    \vect{0}^T & i \neq c
+\end{cases}
+\]
+\[ \frac{d(\vect{w}_c^T\vect{w}_c)}{dW} =
+\left[\begin{matrix}
+    \vect{0}^T \\
+    \vdots \\
+    \leftarrow 2\tilde{\vect{w}}_c^T \rightarrow \\
+    \vdots \\
+    \vect{0}^T
+\end{matrix}\right]
+\begin{matrix} \\ \textrm{(c'th row)} \\ \\ \end{matrix}
+\]
+\[ \frac{1}{2\sigma_w^2}\sum_{c=1}^C \frac{d(\vect{w}_c^T\vect{w}_c)}{dW} = \frac{1}{2\sigma_w^2}
+\left[\begin{matrix}
+    \leftarrow 2\tilde{\vect{w}}_1^T \rightarrow \\
+    \leftarrow 2\tilde{\vect{w}}_1^T \rightarrow \\
+    \vdots \\
+    \leftarrow 2\tilde{\vect{w}}_C^T \rightarrow
+\end{matrix}\right] =
+\frac{1}{\sigma_w^2}W^T
+\]
+
+Substituting this all back into the gradient:
+
+\[ \frac{d\mathcal{C}}{dW} = -Y\tilde{X}^T + P\tilde{X}^T + \frac{1}{\sigma_w^2}W^T \]
+\[ \frac{d\mathcal{C}}{dW} = (P-Y)\tilde{X}^T + \frac{1}{\sigma_w^2}W^T \]
+
+\subsubsection{Gradient descent}
+
+Start with:
+\[ W[0] = 0 \]
+Iterate:
+\[ W[i+1] = W[i] - \eta {\left(\frac{d\mathcal{C}}{dW}\right)}^T \]
+\[ W[i+1] = W[i] - \eta\left(\tilde{X}{(P - Y)}^T + \frac{1}{\sigma_w^2}W\right)\]
+Until convergence, where:
+\[ {\left|\left|\frac{d\mathcal{C}}{dW}\right|\right|}_F < \epsilon \]
+Where $\eta$ is the learning rate and $\epsilon$ is some threshold for the gradient norm.
+
+${\left|\left|\frac{d\mathcal{C}}{dW}\right|\right|}_F$ is the Frobenius norm, and is defined as:
+\[ ||A||_F = \sqrt{\sum_i\sum_j A_{ij}^2} \]
+It is just a sum of the $L_2$ norms of the columns (or rows):
+\begin{align*}
+||A||_F^2 &= \sum_i\sum_j A_{ij}^2 \\
+          &= \sum_j \sum_i {[\vect{a}_j]}_i^2 \\
+          &= \sum_j |\vect{a}_j|^2 \\
+\end{align*}
+
+\end{document}

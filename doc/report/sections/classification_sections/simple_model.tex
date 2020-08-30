@@ -1,0 +1,35 @@
+\documentclass[../../main.tex]{subfiles}
+\begin{document}
+
+Firstly, like with regression, the input vectors $\vect{x}$ can undergo a transformation to produce $\tilde{\vect{x}}$ and that is what is used in the model.
+
+The model is defined by the form of $p_Y(c|\tilde{\vect{x}}, \theta)$, where $\theta$ is the set of parameters which the model depends on:
+\[ p_Y(c|\tilde{\vect{x}}, \theta) \propto \exp{\left(\vect{w}_c^T\tilde{\vect{x}} \right)} \]
+Therefore, the model requires one weight vector per class, resulting in:
+\[ \theta = \left\{\vect{w}_1, \ldots, \vect{w}_C \right\} \]
+With the appropriate normalisation constant:
+\[ p_Y(c|\tilde{\vect{x}}, \theta) = \frac{\exp{\left(\vect{w}_c^T\tilde{\vect{x}} \right)}}{\sum_{k=1}^C \exp{\left(\vect{w}_k^T\tilde{\vect{x}} \right)}} \]
+
+Because it must form a valid probability distribution, you could eliminate one of the weights, so the model only depends on $(C - 1)$ weight vectors.
+This would be done by dividing through by any $\exp(\vect{w}_c^T\tilde{x})$.
+However, in the general case its more practical to keep all $C$ weight vectors.
+
+For binary classification, the model is simplified, only requiring one weight vector:
+\begin{align*}
+p_Y(1|\tilde{\vect{x}})
+&= \frac
+    {\exp(\vect{w}_1^T\tilde{\vect{x}})}
+    {\exp(\vect{w}_1^T\tilde{\vect{x}}) + \exp(\vect{w}_2^T\tilde{\vect{x}})} \\
+&= \frac{1}
+{1 + \exp(-{(\vect{w}_1 - \vect{w}_2)}^T\tilde{\vect{x}})} \\
+&= \frac{1}{1 + \exp(-\vect{w}^T\tilde{\vect{x}})} \\
+&= \sigma(\vect{w}^T\tilde{\vect{x}})
+\end{align*}
+
+It only depends on $(\vect{w_1} - \vect{w_2})$ so is re-parameterised to use $\vect{w}$.
+The result gives the sigmoid function $\sigma(z)$ defined as:
+\[ \sigma(z) = \frac{1}{1 + \vect{w}^T\tilde{\vect{x}}} \]
+
+However, I only look at the general case, since this simplifies to the binary classification problem anyway if $C$ is set to $2$.
+
+\end{document}
