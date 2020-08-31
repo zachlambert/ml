@@ -43,15 +43,17 @@ class ModelLinear:
         # trying a low rank approximation of the inverse
         # A_inv = approximate_inverse(A)
         self.w_mean = np.matmul(np.matmul(A_inv, X_tilde), y)
-        self.w_covar = self.var_e * A
+        self.w_covar = self.var_e * A_inv
 
     def predict(self, X):
         X_tilde = self._transform_X(X)
         y_pred = np.matmul(np.transpose(X_tilde), self.w_mean)
-        y_var = dot_products(
-            np.transpose(X_tilde),
-            np.matmul(np.transpose(X_tilde), self.w_covar)
-        )
+        y_var = np.zeros(y_pred.size)
+        for i in range(y_var.size):
+            y_var[i] = np.matmul(
+                np.transpose(X_tilde[:, i]),
+                np.matmul(self.w_covar, X_tilde[:, i])
+            ) + self.var_e
         return y_pred, y_var
 
     def __repr__(self):
