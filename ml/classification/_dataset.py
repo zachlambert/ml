@@ -6,26 +6,34 @@ from ml.common.transform import (
 
 
 class ArtificialDataset:
-    def __init__(self):
+    def __init__(self, C):
+        self.C = C
         self.X = None
         self.y = None
+        self.D = 0
+        self.N = 0
 
     def generate_X_gaussian(self, D, N, mean=None, cov=None):
+        self.D = D
+        self.N = N
         mean = mean if mean is not None else np.zeros(D)
         cov = cov if cov is not None else np.eye(D)
         self.X = np.transpose(np.random.multivariate_normal(mean, cov, N))
 
     def generate_X_uniform(self, D, N, low=None, high=None):
+        self.D = D
+        self.N = N
         low = low if low is not None else np.zeros(D)
         high = high if high is not None else np.ones(D)
         self.X = np.transpose(np.random.uniform(low, high, (N, D)))
 
     def generate_y(self, transform_X):
         X_tilde = transform_X(self.X)
+        D_tilde = X_tilde.shape[0]
 
-        W = np.zeros(self.D, self.C)
+        W = np.zeros((D_tilde, self.C))
         for c in range(self.C):
-            W[:, c] = np.random.normal(0, 1, X_tilde.shape[0])
+            W[:, c] = np.random.normal(0, 10, D_tilde)
 
         P = np.exp(np.matmul(np.transpose(W), X_tilde))
         P = np.divide(P, np.sum(P, axis=0))
@@ -42,7 +50,7 @@ class ArtificialDataset:
         # on the cmf below the sample value. The label to select is equal
         # to the index of the first cdf value above the sample, which
         # is equivalent to the total number of cdf values below the sample
-        self.y = np.sum(np.less(F, samples), axis=0)
+        self.y = np.sum(np.less(F, samples), axis=0).astype(int)
         return W
 
     def generate_y_linear(self):

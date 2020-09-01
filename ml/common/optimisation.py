@@ -2,7 +2,7 @@ import numpy as np
 
 
 def _gradient_descent(gradient_T_func, norm_func, theta_shape,
-                      learning_rate=0.1, norm_threshold=1e-3):
+                      learning_rate=0.1, norm_threshold=0.1):
     theta = np.zeros(theta_shape)
     gradient_T = gradient_T_func(theta)
     while norm_func(gradient_T) >= norm_threshold:
@@ -12,10 +12,10 @@ def _gradient_descent(gradient_T_func, norm_func, theta_shape,
 
 
 def gradient_descent_vector(gradient_T_func, num_params, learning_rate=0.1,
-                            norm_threshold=1e-3):
+                            norm_threshold=0.1):
     return _gradient_descent(
         gradient_T_func,
-        lambda grad: np.abs(grad),  # Default is L2 norm for vectors
+        lambda grad: np.linalg.norm(grad),  # Default is L2 norm for vectors
         (num_params, 1),
         learning_rate,
         norm_threshold
@@ -23,10 +23,11 @@ def gradient_descent_vector(gradient_T_func, num_params, learning_rate=0.1,
 
 
 def gradient_descent_matrix(gradient_T_func, theta_shape, learning_rate=0.1,
-                            norm_threshold=1e-3):
+                            norm_threshold=0.1):
     return _gradient_descent(
         gradient_T_func,
-        lambda grad: np.abs(grad),  # Default is Frobenius norm for matrices
+        lambda grad: np.linalg.norm(grad),
+        # Default is Frobenius norm for matrices
         theta_shape,
         learning_rate,
         norm_threshold

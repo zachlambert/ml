@@ -20,23 +20,23 @@ def make_transform_X_polynomial(order):
     return transform_X
 
 
-def make_transform_X_radial_basis(centres, widths):
-    c = np.transpose(np.array(centres))
+def make_transform_X_radial_basis(C, widths):
     w = np.array(widths)
     w = w.reshape(w.size, 1)
-    assert c.shape[1] == w.size
+    assert C.shape[1] == w.size
 
     def transform_X(X):
-        assert c.shape[0] == X.shape[0]
+        assert C.shape[0] == X.shape[0]
         return np.concatenate(
             [np.ones((1, X.shape[1]))]
             + [
                 np.exp(
                     -0.5
-                    * np.sum((X - c[:, k]) ** 2, axis=0)
+                    * np.sum((X - C[:, k].reshape((C.shape[0], 1))) ** 2,
+                             axis=0)
                     / widths[k]
-                )
+                ).reshape((1, X.shape[1]))
                 for k in range(w.size)
-            ]
+            ], axis=0
         )
     return transform_X

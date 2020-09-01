@@ -9,7 +9,7 @@ class Manager:
         self.output_name = "output"
 
         self.C = C
-        self._class_names = ["class {}".format(i + 1) for i in range(C)]
+        self._class_names = ["class {}".format(i) for i in range(C)]
 
         self.N = 0
         self.X = None
@@ -25,16 +25,19 @@ class Manager:
         self.X = X
         self.N = X.shape[1]
         assert y.shape[0] == self.N
-        assert(type(y.dtype) == int)
-        assert(np.logical_and(y >= 1, y <= self.C).all())
+        assert(y.dtype == int)
+        assert(np.logical_and(y >= 0, y < self.C).all())
         self.y = np.reshape(y, y.size)
+
+    def clear_models(self):
+        self.models = []
 
     def add_model(self, model):
         self.models.append(model)
 
     def fit(self):
         for model in self.models:
-            model.fit(self.X_train, self.y_train)
+            model.fit(self.C, self.X_train, self.y_train)
 
         self.models_mse = []
         for model in self.models:

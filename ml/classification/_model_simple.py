@@ -16,7 +16,7 @@ def _P_matrix(X_tilde, W):
 
 
 def _Y_matrix(y, C):
-    Y = np.zeros(C, y.size)
+    Y = np.zeros((C, y.size))
     for i, c in enumerate(y):
         Y[c, i] = 1
     return Y
@@ -42,30 +42,33 @@ class ModelSimple:
 
         self.W = None
 
-    def fit(self, X, y):
+    def fit(self, C, X, y):
+        self.C = C
         if self.transform == "gaussian_radial_basis":
             self._transform_X = make_transform_X_radial_basis(
-                X, np.full(X.shape[0], self.basis_width)
+                X, np.full(X.shape[1], self.basis_width)
             )
         X_tilde = self._transform_X(X)
-        Y = _Y_matrix(y)
+        self.D_tilde = X_tilde.shape[0]
+        Y = _Y_matrix(y, self.C)
 
         def cost_gradient_T(W):
-            return np.matmul(X_tilde,
+            grad = np.matmul(X_tilde,
                              np.transpose(_P_matrix(X_tilde, W) - Y)) \
-                   + (1/self.var_w**2)*W
+                + (1/self.var_w**2)*W
+            return grad
 
         self.W = gradient_descent_matrix(
-            cost_gradient_T, (self.D, self.C), self.learning_rate
+            cost_gradient_T, (self.D_tilde, self.C), self.learning_rate
         )
 
     def predict(self, X):
         X_tilde = self._transform_X(X)
         P_matrix_pred = _P_matrix(X_tilde, self.W)
-        y_pred = np.argmax(P_matrix_pred)
+        y_pred = np.argmax(P_matrix_pred, axis=0)
         y_prob = P_matrix_pred[y_pred]
         return y_pred, y_prob
 
     def __repr__(self):
-        return "Linear, transform={}, var_e={}, var_ratio={}, weights={}" \
-            .format(self.transform, self.var_e, self.var_ratio, self.w_mean)
+        return "Simple, transform={}, learning_rate={}, var_w={}, weights={}" \
+            .format(self.transform, self.learning_rate, self.var_w, self.W)

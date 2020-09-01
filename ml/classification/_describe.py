@@ -9,7 +9,7 @@ def describe_data(manager):
     string += "Class names: {}\n".format(manager.class_names)
     string += "Output name: {}\n".format(manager.output_name)
     string += "{} data points\n".format(manager.N)
-    for c in range(1, manager.C + 1):
+    for c in range(manager.C):
         string += "\tNum {} = {}\n".format(c, np.sum(manager.y == c))
     return string
 
