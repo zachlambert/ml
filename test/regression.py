@@ -1,5 +1,5 @@
 import sys
-sys.path.append("/home/zach/code/projects/machine_learning/ml_library/")
+sys.path.append("../") # If run from within test directory
 from ml import regression as reg
 import matplotlib.pyplot as plt
 
@@ -15,9 +15,9 @@ r.load_data(d.X, d.y)
 print("===== DATA =====")
 print(reg.describe_data(r))
 
-reg.plot_data_one_feature(None, r, 0)
-plt.show()
-reg.plot_data_two_features(None, r, 0, 1)
+fig, [ax1, ax2] = plt.subplots(1, 2)
+reg.plot_data_one_feature(ax1, r, 0)
+reg.plot_data_two_features(ax2, r, 0, 1)
 plt.show()
 
 r.add_model(reg.ModelLinear())
@@ -27,7 +27,7 @@ r.fit()
 print("===== RESULTS =====")
 print(reg.describe_results(r))
 
-reg.plot_result_one_feature(None, r, 0)
-plt.show()
-reg.plot_result_one_feature(None, r, 1)
+fig, [ax1, ax2] = plt.subplots(1, 2)
+reg.plot_results_one_feature(ax1, r, 0)
+reg.plot_results_one_feature(ax2, r, 1)
 plt.show()
